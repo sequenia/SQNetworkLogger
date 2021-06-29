@@ -1,6 +1,5 @@
 //
 //  NetworkErrorInfoViewController.swift
-//  Wilgood-iOS
 //
 //  Created by Ivan Mikhailovskii on 13.10.2020.
 //  Copyright © 2020 Sequenia OOO. All rights reserved.
@@ -18,7 +17,7 @@ class NetworkErrorInfoViewController: UIViewController {
         super.viewDidLoad()
         
         self.addButtonNavBar()
-        self.title = "Ошибка"
+        self.title = "Error info"
         self.infoTextView.text = self.networkError?.description()
     }
     
@@ -29,7 +28,6 @@ class NetworkErrorInfoViewController: UIViewController {
     @objc func share() {
         let message = ["```\n\(self.networkError?.description() ?? "")\n```"]
         let activityVC = UIActivityViewController(activityItems: message, applicationActivities: nil)
-        activityVC.excludedActivityTypes = [.mail, .message, .airDrop, .copyToPasteboard]
         activityVC.popoverPresentationController?.sourceView = self.view
         self.navigationController?.present(activityVC, animated: true, completion: nil)
     }

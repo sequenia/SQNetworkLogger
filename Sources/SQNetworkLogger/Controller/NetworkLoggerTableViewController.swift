@@ -1,6 +1,5 @@
 //
 //  NetworkLoggerTableViewController.swift
-//  Wilgood-iOS
 //
 //  Created by Ivan Mikhailovskii on 13.10.2020.
 //  Copyright © 2020 Sequenia OOO. All rights reserved.
@@ -15,7 +14,7 @@ public class NetworkLoggerTableViewController: UITableViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = "Список ошибок"
+        self.title = "Errors list"
         self.registerCell()
         self.getNetworkErrors()
         self.tableView.reloadData()
@@ -26,10 +25,7 @@ public class NetworkLoggerTableViewController: UITableViewController {
     }
     
     func getNetworkErrors() {
-        let userDefaults = UserDefaults.standard
-        if let networkErrorArray = userDefaults.array(forKey: "network_errors") as? [Data] {
-            self.data = networkErrorArray.map( { try! JSONDecoder().decode(SQNetworkError.self, from: $0) } )
-        }
+        self.data = SQNetworkError.savedLogs
     }
 
 // MARK: - Table view data source

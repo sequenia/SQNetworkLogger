@@ -5,58 +5,47 @@ import Foundation
 public class SQNetworkLoggerPlugin: PluginType {
     
     var logger: SQNetworkError?
+    var cURL: String?
+
     private var isDebug: Bool
+    private var limit: Int
     
-    public init(isDebug: Bool = true) {
+    public init(isDebug: Bool = true, limit: Int = 100) {
         self.isDebug = isDebug
+        self.limit = limit
+    }
+
+    public func willSend(_ request: RequestType, target: TargetType) {
+        _ = request.cURLDescription { [weak self] output in
+            self?.cURL = output
+        }
     }
     
-    public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
-        self.logger = SQNetworkError()
-        if let headers = target.headers {
-            self.logger?.headers = ""
-            headers.forEach { (key, value) in
-                self.logger?.headers! += "\(key) : \(value)\n"
-            }
-        }
-    
-        self.logger?.method = target.method.rawValue
-        
+    public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {        
         switch result {
         case .success(let response):
-            self.logger?.url = response.request?.url?.absoluteString
-            if let httpBody = response.request?.httpBody {
-                self.logger?.httpBody = try? JSON.init(data: httpBody).description
-            }
-            
-            do {
-                let json = JSON(try response.mapJSON())
-                self.logger?.responseJSON = json.description
-                self.logger?.statusCode = String(response.statusCode)
+            if let request = response.request {
+                self.logger = SQNetworkError(
+                    withRequest: request,
+                    cURL: self.cURL,
+                    response: response.response,
+                    responseBody: response.data
+                )
                 
-                if json["error_code"].string != nil ||
-                    response.statusCode >= 400 ||
-                    response.statusCode <= 0 {
-                    
-                    self.saveLog()
-                    return
-                }
-                
-                if self.isDebug {
-                    self.saveLog()
-                    return
-                }
-                
-            } catch {
-                self.logger?.statusCode = String(response.statusCode)
                 self.saveLog()
             }
-        case .failure(let moyaError):
-            self.logger?.url = moyaError.response?.request?.url?.absoluteString
-            switch moyaError {
+        case .failure(let error):
+            if let request = error.response?.request {
+                self.logger = SQNetworkError(
+                    withRequest: request,
+                    response: error.response?.response,
+                    responseBody: error.response?.data
+                )
+            }
+            switch error {
             case .underlying(let underlyingError, _):
-                let error = NSError.error(from: underlyingError)
-                self.logger?.statusCode = String(error.code)
+                let nsError = NSError.error(from: underlyingError)
+                self.logger?.statusCode = nsError.code
             default:
                 break
             }
@@ -66,14 +55,7 @@ public class SQNetworkLoggerPlugin: PluginType {
     
     func saveLog() {
         guard let logger = self.logger else { return }
-        
-        let userDefaults = UserDefaults.standard
-        
-        if let encoded = try? JSONEncoder().encode(logger) {
-            var networkErrors = userDefaults.array(forKey: "network_errors") ?? [Data]()
-            networkErrors.append(encoded)
-            UserDefaults.standard.set(networkErrors, forKey: "network_errors")
-            userDefaults.synchronize()
-        }
+
+        SQNetworkError.saveLog(logger, limit: self.limit)
     }
 }
