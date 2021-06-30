@@ -14,15 +14,13 @@ let package = Package(
             targets: ["SQNetworkLogger"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", .upToNextMajor(from: "5.0.0") ),
         .package(url: "https://github.com/Moya/Moya.git", .upToNextMajor(from: "14.0.0"))
     ],
     targets: [
         .target(
             name: "SQNetworkLogger",
             dependencies: [
-                .product(name: "Moya", package: "Moya"),
-                .product(name: "SwiftyJSON", package: "SwiftyJSON"),
+                .product(name: "Moya", package: "Moya")
             ]),
         .testTarget(
             name: "SQNetworkLoggerTests",

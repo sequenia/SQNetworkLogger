@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Screen for displaying log of requests
 public class NetworkLoggerTableViewController: UITableViewController {
     
     private var data = [SQNetworkError]()
@@ -14,18 +15,33 @@ public class NetworkLoggerTableViewController: UITableViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = "Errors list"
+        self.setupNavigationBar()
         self.registerCell()
         self.getNetworkErrors()
         self.tableView.reloadData()
     }
     
-    func registerCell() {
+    private func registerCell() {
         self.tableView.sq_register(NLInfoTableCell.self)
     }
     
-    func getNetworkErrors() {
+    private func getNetworkErrors() {
         self.data = SQNetworkError.savedLogs
+    }
+
+    private func setupNavigationBar() {
+        self.title = "Errors list"
+
+        let backItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        self.navigationItem.backBarButtonItem = backItem
+
+        let closeItem = UIBarButtonItem(barButtonSystemItem: .stop, target: self, action: #selector(self.onCloseButtonClicked(_:)))
+        self.navigationItem.leftBarButtonItem = closeItem
+    }
+
+    @objc
+    private func onCloseButtonClicked(_ sender: UIBarButtonItem) {
+        self.dismiss(animated: true, completion: nil)
     }
 
 // MARK: - Table view data source
@@ -48,5 +64,12 @@ public class NetworkLoggerTableViewController: UITableViewController {
         let controller = NetworkErrorInfoViewController(nibName: "NetworkErrorInfoViewController", bundle: Bundle.module)
         controller.networkError = self.data[indexPath.row]
         self.navigationController?.pushViewController(controller, animated: true)
+    }
+}
+
+public extension NetworkLoggerTableViewController {
+
+    static var loggerScreen: UIViewController {
+        UINavigationController(rootViewController: NetworkLoggerTableViewController())
     }
 }

@@ -1,17 +1,22 @@
 import Moya
-import SwiftyJSON
 import Foundation
 
+/// Moya plugin for saving all server requests and responses in UserDefaults
 public class SQNetworkLoggerPlugin: PluginType {
-    
-    var logger: SQNetworkError?
-    var cURL: String?
 
-    private var isDebug: Bool
+    private var isActive: Bool
     private var limit: Int
     
-    public init(isDebug: Bool = true, limit: Int = 100) {
-        self.isDebug = isDebug
+    private var logger: SQNetworkError?
+    private var cURL: String?
+
+    /// Creates a plugin instance
+    ///
+    /// - Parameters:
+    ///   - isActive: will be the plugin active?
+    ///   - limit: length of requests log history (100 by default)
+    public init(isActive: Bool = true, limit: Int = 100) {
+        self.isActive = isActive
         self.limit = limit
     }
 
@@ -25,18 +30,18 @@ public class SQNetworkLoggerPlugin: PluginType {
         switch result {
         case .success(let response):
             if let request = response.request {
-                self.logger = SQNetworkError(
+                logger = SQNetworkError(
                     withRequest: request,
-                    cURL: self.cURL,
+                    cURL: cURL,
                     response: response.response,
                     responseBody: response.data
                 )
                 
-                self.saveLog()
+                saveLog()
             }
         case .failure(let error):
             if let request = error.response?.request {
-                self.logger = SQNetworkError(
+                logger = SQNetworkError(
                     withRequest: request,
                     response: error.response?.response,
                     responseBody: error.response?.data
@@ -45,17 +50,18 @@ public class SQNetworkLoggerPlugin: PluginType {
             switch error {
             case .underlying(let underlyingError, _):
                 let nsError = NSError.error(from: underlyingError)
-                self.logger?.statusCode = nsError.code
+                logger?.statusCode = nsError.code
             default:
                 break
             }
-            self.saveLog()
+            saveLog()
         }
     }
     
     func saveLog() {
-        guard let logger = self.logger else { return }
+        guard let logger = logger,
+              isActive else { return }
 
-        SQNetworkError.saveLog(logger, limit: self.limit)
+        SQNetworkError.saveLog(logger, limit: limit)
     }
 }

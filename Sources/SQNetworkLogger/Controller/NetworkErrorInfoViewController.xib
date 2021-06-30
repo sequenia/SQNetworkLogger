@@ -21,18 +21,51 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="52k-Xa-wwa">
-                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <rect key="frame" x="0.0" y="44" width="414" height="774"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                     <color key="textColor" systemColor="labelColor"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cXX-OW-AgV">
+                    <rect key="frame" x="0.0" y="818" width="414" height="44"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lY8-aL-Cah">
+                            <rect key="frame" x="0.0" y="0.0" width="207" height="44"/>
+                            <state key="normal" title="Share request"/>
+                            <connections>
+                                <action selector="onShareRequestClicked:" destination="-1" eventType="touchUpInside" id="4fC-83-HcO"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eyM-lP-mTU">
+                            <rect key="frame" x="207" y="0.0" width="207" height="44"/>
+                            <state key="normal" title="Share response"/>
+                            <connections>
+                                <action selector="onShareResponseClicked:" destination="-1" eventType="touchUpInside" id="4fC-83-HcP"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="eyM-lP-mTU" firstAttribute="width" secondItem="lY8-aL-Cah" secondAttribute="width" id="6zm-3x-LYP"/>
+                        <constraint firstItem="eyM-lP-mTU" firstAttribute="top" secondItem="cXX-OW-AgV" secondAttribute="top" id="HTB-gA-TOg"/>
+                        <constraint firstAttribute="bottom" secondItem="eyM-lP-mTU" secondAttribute="bottom" id="IdC-7Y-s8f"/>
+                        <constraint firstItem="lY8-aL-Cah" firstAttribute="leading" secondItem="cXX-OW-AgV" secondAttribute="leading" id="LJJ-6R-7lG"/>
+                        <constraint firstItem="eyM-lP-mTU" firstAttribute="leading" secondItem="lY8-aL-Cah" secondAttribute="trailing" id="Sbu-cL-LEe"/>
+                        <constraint firstAttribute="height" constant="44" id="UAy-tN-zlr"/>
+                        <constraint firstAttribute="bottom" secondItem="lY8-aL-Cah" secondAttribute="bottom" id="cxA-nw-GNi"/>
+                        <constraint firstItem="lY8-aL-Cah" firstAttribute="top" secondItem="cXX-OW-AgV" secondAttribute="top" id="m1X-q8-QX4"/>
+                        <constraint firstAttribute="trailing" secondItem="eyM-lP-mTU" secondAttribute="trailing" id="o03-pQ-7Lt"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="52k-Xa-wwa" secondAttribute="bottom" id="UON-Q1-rJt"/>
+                <constraint firstItem="cXX-OW-AgV" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="1Pz-Sm-CZr"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="cXX-OW-AgV" secondAttribute="trailing" id="6k3-Ef-3Lw"/>
+                <constraint firstItem="cXX-OW-AgV" firstAttribute="top" secondItem="52k-Xa-wwa" secondAttribute="bottom" id="T3Z-Dn-l3X"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="cXX-OW-AgV" secondAttribute="bottom" id="VUI-gM-O3e"/>
                 <constraint firstItem="52k-Xa-wwa" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="fKo-fq-9xd"/>
                 <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="52k-Xa-wwa" secondAttribute="trailing" id="jyh-6h-hME"/>
                 <constraint firstItem="52k-Xa-wwa" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="tZW-RA-f6S"/>

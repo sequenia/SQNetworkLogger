@@ -18,9 +18,9 @@ extension NSError {
 
 extension Date {
 
-    public var formattedDate: String? {
+    public var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm, dd.MM.yy"
+        formatter.dateFormat = "HH:mm, dd.MM.yyyy"
 
         return formatter.string(from: self)
     }

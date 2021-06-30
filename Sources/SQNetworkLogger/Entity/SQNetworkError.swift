@@ -117,26 +117,38 @@ class SQNetworkError: Codable {
         try container.encode(self.cURL, forKey: .cURL)
         
     }
-    
-    func description() -> String {
-        """
-        \(self.date.formattedDate)
 
+    func requestInfo() -> String {
+        """
         \(self.method ?? "-"): \(self.url ?? "-")
-        
+
         Headers:
         \(self.headers ?? "-")
 
         HttpBody:
         \(self.httpBody ?? "-")
+        """
+    }
 
-        cURL:
-        \(self.cURL ?? "-")
-
+    func responseInfo() -> String {
+        """
         Status code: \(self.statusCode ?? 0)
 
         Response:
         \(self.response ?? "-")
+        """
+    }
+    
+    func description() -> String {
+        """
+        \(self.date.formattedDate)
+
+        \(self.requestInfo())
+
+        cURL:
+        \(self.cURL ?? "-")
+
+        \(self.responseInfo())
         """
     }
 }
