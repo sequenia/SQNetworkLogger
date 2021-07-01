@@ -6,6 +6,7 @@ public class SQNetworkLoggerPlugin: PluginType {
 
     private var isActive: Bool
     private var limit: Int
+    private var logCurl: Bool
     
     private var logger: SQNetworkError?
     private var cURL: String?
@@ -15,14 +16,22 @@ public class SQNetworkLoggerPlugin: PluginType {
     /// - Parameters:
     ///   - isActive: will be the plugin active?
     ///   - limit: length of requests log history (100 by default)
-    public init(isActive: Bool = true, limit: Int = 100) {
+    ///   - logCurl: need log cURL representations in console
+    public init(isActive: Bool = true, limit: Int = 100, logCurl: Bool = true) {
         self.isActive = isActive
         self.limit = limit
+        self.logCurl = logCurl
     }
 
     public func willSend(_ request: RequestType, target: TargetType) {
         _ = request.cURLDescription { [weak self] output in
-            self?.cURL = output
+            guard let self = self else { return }
+
+            self.cURL = output
+            if self.logCurl {
+                print("Request: \(output)")
+            }
+
         }
     }
     
