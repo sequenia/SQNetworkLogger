@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Ivan Mikhailovskii on 23.06.2021.
-//
-
 import Foundation
 
 extension NSError {
@@ -48,7 +41,7 @@ extension URLRequest {
         }
 
         cURL += method + url + header + data
-        if pretty {
+        if pretty, data.isEmpty {
             cURL.removeLast(newLine.count)
         }
 
