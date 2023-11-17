@@ -12,7 +12,7 @@ class NetworkErrorInfoViewController: UIViewController {
     
     @IBOutlet private weak var infoTextView: UITextView!
     
-    public var networkError: SQNetworkError?
+    public var networkError: SQNetworkRequestLog?
 
     @IBAction private func onShareRequestClicked(_ sender: UIButton) {
         var shareItems = [String]()
@@ -35,7 +35,7 @@ class NetworkErrorInfoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.title = "Error info"
+        self.title = "Request info"
         self.infoTextView.text = self.networkError?.description()
     }
     

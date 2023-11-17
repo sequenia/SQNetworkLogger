@@ -1,6 +1,6 @@
 import UIKit
 
-class SQNetworkError: Codable {
+class SQNetworkRequestLog: Codable {
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -153,10 +153,10 @@ class SQNetworkError: Codable {
     }
 }
 
-extension SQNetworkError {
+extension SQNetworkRequestLog {
 
-    static func saveLog(_ log: SQNetworkError, limit: Int) {
-        var currentErrors = SQNetworkError.savedLogs
+    static func saveLog(_ log: SQNetworkRequestLog, limit: Int) {
+        var currentErrors = SQNetworkRequestLog.savedLogs
         currentErrors.insert(log, at: 0)
         currentErrors = Array(currentErrors.prefix(limit))
         
@@ -165,13 +165,17 @@ extension SQNetworkError {
         UserDefaults.standard.synchronize()
     }
 
-    static var savedLogs: [SQNetworkError] {
+    static var savedLogs: [SQNetworkRequestLog] {
         guard let networkErrorArray = UserDefaults.standard.array(forKey: .networkErrorsKey) as? [Data] else {
             return []
         }
 
-        return networkErrorArray.compactMap { try? JSONDecoder().decode(SQNetworkError.self, from: $0) }
+        return networkErrorArray.compactMap { try? JSONDecoder().decode(SQNetworkRequestLog.self, from: $0) }
                                 .sorted(by: { $0.date > $1.date })
+    }
+    static func clearLoags() {
+        UserDefaults.standard.set(nil, forKey: .networkErrorsKey)
+        UserDefaults.standard.synchronize()
     }
 }
 

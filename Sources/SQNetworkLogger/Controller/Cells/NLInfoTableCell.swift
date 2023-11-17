@@ -21,7 +21,7 @@ class NLInfoTableCell: UITableViewCell {
         self.indicatorView.layer.cornerRadius = self.indicatorView.frame.width / 2.0
     }
     
-    func bind(entity: SQNetworkError) {
+    func bind(entity: SQNetworkRequestLog) {
         self.methodLabel.text = entity.method
         self.urlLabel.text = entity.url
         self.timeLabel.text = entity.date.formattedDate

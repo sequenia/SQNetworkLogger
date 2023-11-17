@@ -10,38 +10,61 @@ import UIKit
 /// Screen for displaying log of requests
 public class NetworkLoggerTableViewController: UITableViewController {
     
-    private var data = [SQNetworkError]()
-        
+    private var data = [SQNetworkRequestLog]()
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         
         self.setupNavigationBar()
         self.registerCell()
-        self.getNetworkErrors()
+        self.getReuestList()
+
+        self.refreshControl = UIRefreshControl()
+        self.refreshControl?.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
+        self.tableView.refreshControl = self.refreshControl
+
         self.tableView.reloadData()
     }
     
+    @objc 
+    func refresh(_ sender: AnyObject) {
+        self.getReuestList()
+        self.tableView.reloadData()
+        self.refreshControl?.endRefreshing()
+    }
+
     private func registerCell() {
         self.tableView.sq_register(NLInfoTableCell.self)
     }
     
-    private func getNetworkErrors() {
-        self.data = SQNetworkError.savedLogs
+    private func getReuestList() {
+        self.data = SQNetworkRequestLog.savedLogs
     }
 
     private func setupNavigationBar() {
-        self.title = "Errors list"
+        self.title = "Request list"
 
         let backItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         self.navigationItem.backBarButtonItem = backItem
 
         let closeItem = UIBarButtonItem(barButtonSystemItem: .stop, target: self, action: #selector(self.onCloseButtonClicked(_:)))
+
+        let clearItem = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(self.onClearButtonClicked(_:)))
+
         self.navigationItem.leftBarButtonItem = closeItem
+        self.navigationItem.rightBarButtonItem = clearItem
     }
 
     @objc
     private func onCloseButtonClicked(_ sender: UIBarButtonItem) {
         self.dismiss(animated: true, completion: nil)
+    }
+
+    @objc
+    private func onClearButtonClicked(_ sender: UIBarButtonItem) {
+        SQNetworkRequestLog.clearLoags()
+        self.getReuestList()
+        self.tableView.reloadData()
     }
 
 // MARK: - Table view data source

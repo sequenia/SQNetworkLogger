@@ -8,7 +8,7 @@ public class SQNetworkLoggerPlugin: PluginType {
     private var limit: Int
     private var logCurl: Bool
     
-    private var logger: SQNetworkError?
+    private var logger: SQNetworkRequestLog?
     private var cURL: String?
 
     /// Creates a plugin instance
@@ -24,22 +24,21 @@ public class SQNetworkLoggerPlugin: PluginType {
     }
 
     public func willSend(_ request: RequestType, target: TargetType) {
-        _ = request.cURLDescription { [weak self] output in
-            guard let self = self else { return }
+        if !self.isActive { return }
 
-            self.cURL = output
-            if self.logCurl {
-                print("Request: \(output)")
-            }
-
+        self.cURL = request.request?.cURL(pretty: true)
+        if self.logCurl {
+            print("Request: \(self.cURL)")
         }
     }
     
-    public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {        
+    public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
+        if !self.isActive { return }
+
         switch result {
         case .success(let response):
             if let request = response.request {
-                logger = SQNetworkError(
+                logger = SQNetworkRequestLog(
                     withRequest: request,
                     cURL: cURL,
                     response: response.response,
@@ -50,7 +49,7 @@ public class SQNetworkLoggerPlugin: PluginType {
             }
         case .failure(let error):
             if let request = error.response?.request {
-                logger = SQNetworkError(
+                logger = SQNetworkRequestLog(
                     withRequest: request,
                     response: error.response?.response,
                     responseBody: error.response?.data
@@ -71,6 +70,6 @@ public class SQNetworkLoggerPlugin: PluginType {
         guard let logger = logger,
               isActive else { return }
 
-        SQNetworkError.saveLog(logger, limit: limit)
+        SQNetworkRequestLog.saveLog(logger, limit: limit)
     }
 }
