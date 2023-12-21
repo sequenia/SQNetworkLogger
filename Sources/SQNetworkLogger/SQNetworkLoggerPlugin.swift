@@ -35,6 +35,7 @@ public class SQNetworkLoggerPlugin: PluginType {
     public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
         if !self.isActive { return }
 
+        var logger: SQNetworkRequestLog?
         switch result {
         case .success(let response):
             if let request = response.request {
@@ -45,7 +46,7 @@ public class SQNetworkLoggerPlugin: PluginType {
                     responseBody: response.data
                 )
                 
-                saveLog()
+                saveLog(logger)
             }
         case .failure(let error):
             if let request = error.response?.request {
@@ -62,14 +63,13 @@ public class SQNetworkLoggerPlugin: PluginType {
             default:
                 break
             }
-            saveLog()
+            saveLog(logger)
         }
     }
     
-    func saveLog() {
-        guard let logger = logger,
-              isActive else { return }
+    func saveLog(_ logget: SQNetworkRequestLog?) {
+        guard let logger = logger, isActive else { return }
 
-        SQNetworkRequestLog.saveLog(logger, limit: limit)
+        _Concurrency.Task { await SQNetworkRequestLog.saveLog(logger, limit: limit) }
     }
 }

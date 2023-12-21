@@ -155,7 +155,7 @@ class SQNetworkRequestLog: Codable {
 
 extension SQNetworkRequestLog {
 
-    static func saveLog(_ log: SQNetworkRequestLog, limit: Int) {
+    static func saveLog(_ log: SQNetworkRequestLog, limit: Int) async {
         var currentErrors = SQNetworkRequestLog.savedLogs
         currentErrors.insert(log, at: 0)
         currentErrors = Array(currentErrors.prefix(limit))
