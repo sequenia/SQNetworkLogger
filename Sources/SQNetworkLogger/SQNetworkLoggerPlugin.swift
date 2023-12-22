@@ -2,14 +2,12 @@ import Moya
 import Foundation
 
 /// Moya plugin for saving all server requests and responses in UserDefaults
-public class SQNetworkLoggerPlugin: PluginType {
+public actor SQNetworkLoggerPlugin: PluginType {
 
     private var isActive: Bool
     private var limit: Int
     private var logCurl: Bool
-    
-    private var logger: SQNetworkRequestLog?
-    private var cURL: String?
+    private var dictionaryRequests: NSMutableDictionary
 
     /// Creates a plugin instance
     ///
@@ -21,18 +19,27 @@ public class SQNetworkLoggerPlugin: PluginType {
         self.isActive = isActive
         self.limit = limit
         self.logCurl = logCurl
+        self.dictionaryRequests = [:]
     }
 
-    public func willSend(_ request: RequestType, target: TargetType) {
-        if !self.isActive { return }
+    nonisolated public func willSend(_ request: RequestType, target: TargetType) {
+        _Concurrency.Task { await self.asyncWillSend(request, target: target) }
+    }
 
-        self.cURL = request.request?.cURL(pretty: true)
-        if self.logCurl {
-            print("Request: \(self.cURL)")
+    nonisolated private func asyncWillSend(_ request: RequestType, target: TargetType) async {
+        guard await self.isActive, let urlRequest = request.request else { return }
+
+        await self.dictionaryRequests[urlRequest] = urlRequest.cURL(pretty: true)
+        if await self.logCurl {
+            print("Request: \(urlRequest.cURL(pretty: true))")
         }
     }
-    
-    public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
+
+    nonisolated public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
+        _Concurrency.Task { await self.asyncDidReceive(result, target: target) }
+    }
+
+    private func asyncDidReceive(_ result: Result<Response, MoyaError>, target: TargetType) async {
         if !self.isActive { return }
 
         var logger: SQNetworkRequestLog?
@@ -41,17 +48,23 @@ public class SQNetworkLoggerPlugin: PluginType {
             if let request = response.request {
                 logger = SQNetworkRequestLog(
                     withRequest: request,
-                    cURL: cURL,
+                    cURL: self.dictionaryRequests[request] as? String,
                     response: response.response,
                     responseBody: response.data
                 )
-                
-                saveLog(logger)
+
+                await saveLog(logger)
             }
         case .failure(let error):
             if let request = error.response?.request {
+                var curl: String? = nil
+                if let urlRequest = request.urlRequest {
+                    curl = self.dictionaryRequests[urlRequest] as? String
+                }
+
                 logger = SQNetworkRequestLog(
                     withRequest: request,
+                    cURL: curl,
                     response: error.response?.response,
                     responseBody: error.response?.data
                 )
@@ -63,13 +76,13 @@ public class SQNetworkLoggerPlugin: PluginType {
             default:
                 break
             }
-            saveLog(logger)
+            await saveLog(logger)
         }
     }
-    
-    func saveLog(_ logget: SQNetworkRequestLog?) {
+
+    private func saveLog(_ logger: SQNetworkRequestLog?) async {
         guard let logger = logger, isActive else { return }
 
-        _Concurrency.Task { await SQNetworkRequestLog.saveLog(logger, limit: limit) }
+        await SQNetworkRequestLog.saveLog(logger, limit: limit)
     }
 }
