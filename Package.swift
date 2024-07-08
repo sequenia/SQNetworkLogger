@@ -14,7 +14,7 @@ let package = Package(
             targets: ["SQNetworkLogger"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Moya/Moya.git", .upToNextMajor(from: "14.0.0"))
+        .package(url: "https://github.com/Moya/Moya.git", .upToNextMajor(from: "15.0.3"))
     ],
     targets: [
         .target(
